@@ -1,17 +1,39 @@
 package main
 
-import "fmt"
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"strings"
+)
 
 func main() {
 
-	var text string
-
-	fmt.Scan(&text)
-
-	if (text == "") {
-		fmt.Println("vazia")
+	if (len(os.Args) < 2) {
+		ProcessText()
 	}
-
-	fmt.Println(text)
 }
 
+func ProcessText() {
+	caracteresToAdd := "**"
+	reader := bufio.NewReader(os.Stdin)
+	text, _ := reader.ReadString('\n')
+
+	fmt.Println("\nTexto recebido:", text)
+
+	texts := strings.Fields(text)
+
+	var newTexts []string
+
+	for _, text := range texts {
+		middleIndex:= len(text)/2
+
+		part1 := text[:middleIndex]
+		part2 := text[middleIndex:]
+		newText := caracteresToAdd + part1 + caracteresToAdd + part2
+
+		newTexts = append(newTexts, newText)
+	}
+
+	fmt.Println("Texto convertido para negrito:", strings.Join(newTexts, " "))
+}
