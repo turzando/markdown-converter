@@ -11,6 +11,8 @@ func main() {
 
 	if (len(os.Args) < 2) {
 		ProcessText()
+	} else if (os.Args[1] == "-f") {
+		ProcessTextWithFixationParameter(os.Args[2], os.Args[3])
 	}
 }
 
@@ -36,4 +38,8 @@ func ProcessText() {
 	}
 
 	fmt.Println("Texto convertido para negrito:", strings.Join(newTexts, " "))
+}
+
+func ProcessTextWithFixationParameter(percentage string, text string) {
+	fmt.Println("percentage -> ", percentage, ". text -> ", text)
 }
