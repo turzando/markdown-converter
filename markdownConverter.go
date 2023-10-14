@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 	"strconv"
+	// "io/ioutil"
 )
 
 func main() {
@@ -27,31 +28,63 @@ func main() {
 
 	// text in stdin or file | percentage, jump, fileOutput
 
-	if (len(os.Args) < 2) {
-		reader := bufio.NewReader(os.Stdin)
-		fullText, _ := reader.ReadString('\n')
-		ConvertTextToBold("50", fullText)
-	} else if (os.Args[1] == "-f") {
-		ConvertTextToBold(os.Args[2], os.Args[3])
+	var percentage int
+	var jumps int
+	var fullText string
+
+	reader := bufio.NewReader(os.Stdin)
+	fullText, _ = reader.ReadString('\n')
+
+	systemCounter := 0
+	for _, arg := range os.Args {
+
+		if (arg == "-f") {
+			index := systemCounter+1
+			percentage, _ = strconv.Atoi(os.Args[index])
+		} else if (arg == "-j") {
+			index := systemCounter+1
+			jumps, _ = strconv.Atoi(os.Args[index])
+		} else if (strings.Contains(arg, ".txt")) {
+			file, _ := os.Open(arg)
+			defer file.Close()
+			scanner := bufio.NewScanner(file)
+			for scanner.Scan() {
+				fullText = scanner.Text()
+			}
+		}
+
+		systemCounter++
 	}
 
+	ConvertTextToBold(percentage, fullText, jumps)
 }
 
-func ConvertTextToBold(percentage string, fullText string) {
+func ConvertTextToBold(percentage int, fullText string, jumps int) {
 	caracteresToAdd := "**"
-	intPercentage, _ := strconv.Atoi(percentage)
 
 	var newTexts []string
 
 	texts := strings.Fields(fullText)
 
+	quantity := 0
+
 	for _, text := range texts {
-		indlexByPercentage := (intPercentage * len(text))/100
 
-		part1 := text[:indlexByPercentage]
-		part2 := text[indlexByPercentage:]
-		newText := caracteresToAdd + part1 + caracteresToAdd + part2
+		var newText string
 
+		if (quantity == jumps) {
+			indlexByPercentage := (percentage * len(text))/100
+	
+			part1 := text[:indlexByPercentage]
+			part2 := text[indlexByPercentage:]
+			newText = caracteresToAdd + part1 + caracteresToAdd + part2
+	
+			quantity = 0
+		} else {
+			newText = text
+			quantity++
+		}	
+		
 		newTexts = append(newTexts, newText)
 	}
 
