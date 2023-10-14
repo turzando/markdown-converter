@@ -5,41 +5,55 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"strconv"
 )
 
 func main() {
 
+	// Ter um parâmetro para especificar um arquivo de saída
+	// Exemplo: app -o novo_arquivo.txt meu_texto.txt
+
+	// Ter um parâmetro para especificar a fixação (% mínimo de negrito por palavra)
+	// Exemplo: app -f 70 meu_texto.txt
+
+	// Ter um parâmetro para especificar os pulos (a cada quantas palavras tem um negrito)
+	// Exemplo: app -j 2 meu_texto.txt
+
+	// file prioridade
+
+	// flags nativa pesquisar
+	
+	// se colocar entre aspas entende como apenas um
+
+	// text in stdin or file | percentage, jump, fileOutput
+
 	if (len(os.Args) < 2) {
-		ProcessText()
+		reader := bufio.NewReader(os.Stdin)
+		fullText, _ := reader.ReadString('\n')
+		ConvertTextToBold("50", fullText)
 	} else if (os.Args[1] == "-f") {
-		ProcessTextWithFixationParameter(os.Args[2], os.Args[3])
+		ConvertTextToBold(os.Args[2], os.Args[3])
 	}
+
 }
 
-func ProcessText() {
+func ConvertTextToBold(percentage string, fullText string) {
 	caracteresToAdd := "**"
-	reader := bufio.NewReader(os.Stdin)
-	text, _ := reader.ReadString('\n')
-
-	fmt.Println("\nTexto recebido:", text)
-
-	texts := strings.Fields(text)
+	intPercentage, _ := strconv.Atoi(percentage)
 
 	var newTexts []string
 
-	for _, text := range texts {
-		middleIndex:= len(text)/2
+	texts := strings.Fields(fullText)
 
-		part1 := text[:middleIndex]
-		part2 := text[middleIndex:]
+	for _, text := range texts {
+		indlexByPercentage := (intPercentage * len(text))/100
+
+		part1 := text[:indlexByPercentage]
+		part2 := text[indlexByPercentage:]
 		newText := caracteresToAdd + part1 + caracteresToAdd + part2
 
 		newTexts = append(newTexts, newText)
 	}
 
-	fmt.Println("Texto convertido para negrito:", strings.Join(newTexts, " "))
-}
-
-func ProcessTextWithFixationParameter(percentage string, text string) {
-	fmt.Println("percentage -> ", percentage, ". text -> ", text)
+	fmt.Println(strings.Join(newTexts, " "))
 }
