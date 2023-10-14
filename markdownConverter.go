@@ -6,45 +6,30 @@ import (
 	"os"
 	"strings"
 	"strconv"
-	// "io/ioutil"
 )
 
 func main() {
 
-	// Ter um parâmetro para especificar um arquivo de saída
-	// Exemplo: app -o novo_arquivo.txt meu_texto.txt
+	percentage := 50
+	jumps := 0
+	shouldCreateOutputFile := false
+	fullText := ""
 
-	// Ter um parâmetro para especificar a fixação (% mínimo de negrito por palavra)
-	// Exemplo: app -f 70 meu_texto.txt
-
-	// Ter um parâmetro para especificar os pulos (a cada quantas palavras tem um negrito)
-	// Exemplo: app -j 2 meu_texto.txt
-
-	// file prioridade
-
-	// flags nativa pesquisar
+	var outputFileName string
 	
-	// se colocar entre aspas entende como apenas um
-
-	// text in stdin or file | percentage, jump, fileOutput
-
-	var percentage int
-	var jumps int
-	var fullText string
-
-	reader := bufio.NewReader(os.Stdin)
-	fullText, _ = reader.ReadString('\n')
-
 	systemCounter := 0
 	for _, arg := range os.Args {
-
+		
+		index:= systemCounter+1
+		
 		if (arg == "-f") {
-			index := systemCounter+1
 			percentage, _ = strconv.Atoi(os.Args[index])
 		} else if (arg == "-j") {
-			index := systemCounter+1
 			jumps, _ = strconv.Atoi(os.Args[index])
-		} else if (strings.Contains(arg, ".txt")) {
+		} else if (arg == "-o") {
+			shouldCreateOutputFile = true
+			outputFileName = os.Args[index]
+		} else if (strings.Contains(arg, ".txt") && os.Args[systemCounter-1] != "-o") {
 			file, _ := os.Open(arg)
 			defer file.Close()
 			scanner := bufio.NewScanner(file)
@@ -56,10 +41,22 @@ func main() {
 		systemCounter++
 	}
 
-	ConvertTextToBold(percentage, fullText, jumps)
+	if (fullText == "") {
+		reader := bufio.NewReader(os.Stdin)
+		fullText, _ = reader.ReadString('\n')
+	}
+
+	convertedText := ConvertTextToBold(percentage, fullText, jumps)
+
+	if (shouldCreateOutputFile) {
+		file, _ := os.Create(outputFileName)
+		file.WriteString(convertedText)
+	} else {
+		fmt.Println(convertedText)
+	}
 }
 
-func ConvertTextToBold(percentage int, fullText string, jumps int) {
+func ConvertTextToBold(percentage int, fullText string, jumps int) string{
 	caracteresToAdd := "**"
 
 	var newTexts []string
@@ -88,5 +85,5 @@ func ConvertTextToBold(percentage int, fullText string, jumps int) {
 		newTexts = append(newTexts, newText)
 	}
 
-	fmt.Println(strings.Join(newTexts, " "))
+	return strings.Join(newTexts, " ")
 }
