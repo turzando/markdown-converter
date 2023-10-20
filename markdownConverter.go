@@ -4,8 +4,8 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"strings"
 	"strconv"
+	"strings"
 )
 
 func main() {
@@ -16,39 +16,39 @@ func main() {
 	fullText := ""
 
 	var outputFileName string
-	
+
 	systemCounter := 0
 	for _, arg := range os.Args {
-		
-		index:= systemCounter+1
-		
-		if (arg == "-f") {
+
+		index := systemCounter + 1
+
+		if arg == "-f" {
 			percentage, _ = strconv.Atoi(os.Args[index])
-		} else if (arg == "-j") {
+		} else if arg == "-j" {
 			jumps, _ = strconv.Atoi(os.Args[index])
-		} else if (arg == "-o") {
+		} else if arg == "-o" {
 			shouldCreateOutputFile = true
 			outputFileName = os.Args[index]
-		} else if (strings.Contains(arg, ".txt") && os.Args[systemCounter-1] != "-o") {
+		} else if strings.Contains(arg, ".txt") && os.Args[systemCounter-1] != "-o" {
 			file, _ := os.Open(arg)
 			defer file.Close()
 			scanner := bufio.NewScanner(file)
 			for scanner.Scan() {
-				fullText = scanner.Text()
+				fullText = fullText + scanner.Text()
 			}
 		}
 
 		systemCounter++
 	}
 
-	if (fullText == "") {
+	if fullText == "" {
 		reader := bufio.NewReader(os.Stdin)
 		fullText, _ = reader.ReadString('\n')
 	}
 
 	convertedText := ConvertTextToBold(percentage, fullText, jumps)
 
-	if (shouldCreateOutputFile) {
+	if shouldCreateOutputFile {
 		file, _ := os.Create(outputFileName)
 		file.WriteString(convertedText)
 	} else {
@@ -56,7 +56,7 @@ func main() {
 	}
 }
 
-func ConvertTextToBold(percentage int, fullText string, jumps int) string{
+func ConvertTextToBold(percentage int, fullText string, jumps int) string {
 	caracteresToAdd := "**"
 
 	var newTexts []string
@@ -69,19 +69,20 @@ func ConvertTextToBold(percentage int, fullText string, jumps int) string{
 
 		var newText string
 
-		if (quantity == jumps) {
-			indlexByPercentage := (percentage * len(text))/100
-	
+		if quantity == jumps {
+			//TODO reticencias
+			indlexByPercentage := (percentage * len(text)) / 100
+
 			part1 := text[:indlexByPercentage]
 			part2 := text[indlexByPercentage:]
 			newText = caracteresToAdd + part1 + caracteresToAdd + part2
-	
+
 			quantity = 0
 		} else {
 			newText = text
 			quantity++
-		}	
-		
+		}
+
 		newTexts = append(newTexts, newText)
 	}
 
