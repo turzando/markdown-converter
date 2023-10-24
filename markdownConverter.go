@@ -61,22 +61,47 @@ func ConvertTextToBold(percentage int, fullText string, jumps int) string {
 
 	var newTexts []string
 
-	texts := strings.Fields(fullText)
+	texts := strings.Split(fullText, " ")
+
+	fmt.Println(texts)
 
 	quantity := 0
 
 	for _, text := range texts {
+		// 65 a 90 Maiusculo
+		// 97 a 122 minusculo
+
+		var caractersIndex int
+
+		for i := len(text) - 1; i >= 0; i-- {
+			if LetraMinuscula(text[i]) && i == len(text) {
+				break
+			} else if !LetraMinuscula(text[i]) {
+				caractersIndex = i
+			} else if LetraMinuscula(text[i]) && text[i-1] == 92 {
+				caractersIndex = i
+			} else {
+				break
+			}
+		}
+
+		var caractersFromText string
+
+		if caractersIndex != 0 {
+			caractersFromText = text[caractersIndex:]
+			text = text[:caractersIndex]
+		}
+
+		fmt.Println(caractersFromText)
 
 		var newText string
 
 		if quantity == jumps {
-			//TODO reticencias
 			indlexByPercentage := (percentage * len(text)) / 100
 
 			part1 := text[:indlexByPercentage]
 			part2 := text[indlexByPercentage:]
-			newText = caracteresToAdd + part1 + caracteresToAdd + part2
-
+			newText = caracteresToAdd + part1 + caracteresToAdd + part2 + caractersFromText
 			quantity = 0
 		} else {
 			newText = text
@@ -87,4 +112,8 @@ func ConvertTextToBold(percentage int, fullText string, jumps int) string {
 	}
 
 	return strings.Join(newTexts, " ")
+}
+
+func LetraMinuscula(byteCaracter byte) bool {
+	return byteCaracter >= 97 && byteCaracter <= 122
 }

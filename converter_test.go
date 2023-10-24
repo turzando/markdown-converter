@@ -59,3 +59,31 @@ func TestShouldConvert70PercentageInBoldAndJumpTwoWords(t *testing.T) {
 		t.Errorf("Expected '%s' but was '%s'", expectedText, convertResult)
 	}
 }
+
+func TestShouldConvert70PercentageInBoldOnlyWordsAndKeepBreakLine(t *testing.T) {
+	percentage := 70
+	jumps := 0
+	text := "maturidade\n maturidade"
+
+	expectedText := "**maturid**ade\n **maturid**ade"
+
+	convertResult := ConvertTextToBold(percentage, text, jumps)
+
+	if convertResult != expectedText {
+		t.Errorf("Expected '%s' but was '%s'", expectedText, convertResult)
+	}
+}
+
+func TestShouldConvert50PercentageInBoldOnlyWordsAndKeepDot(t *testing.T) {
+	percentage := 50
+	jumps := 0
+	text := "teste. teste."
+
+	expectedText := "**te**ste. **te**ste."
+
+	convertResult := ConvertTextToBold(percentage, text, jumps)
+
+	if convertResult != expectedText {
+		t.Errorf("Expected '%s' but was '%s'", expectedText, convertResult)
+	}
+}
