@@ -30,12 +30,9 @@ func main() {
 			shouldCreateOutputFile = true
 			outputFileName = os.Args[index]
 		} else if strings.Contains(arg, ".txt") && os.Args[systemCounter-1] != "-o" {
-			file, _ := os.Open(arg)
-			defer file.Close()
-			scanner := bufio.NewScanner(file)
-			for scanner.Scan() {
-				fullText = fullText + scanner.Text()
-			}
+			fileContent, _ := os.ReadFile(arg)
+
+			fullText = string(fileContent)
 		}
 
 		systemCounter++
@@ -59,61 +56,75 @@ func main() {
 func ConvertTextToBold(percentage int, fullText string, jumps int) string {
 	caracteresToAdd := "**"
 
-	var newTexts []string
-
-	texts := strings.Split(fullText, " ")
-
-	fmt.Println(texts)
+	var convertedWords []string
 
 	quantity := 0
 
-	for _, text := range texts {
-		// 65 a 90 Maiusculo
-		// 97 a 122 minusculo
+	treatedWords := TreatLineBreak(fullText)
 
+	for _, word := range treatedWords {
 		var caractersIndex int
 
-		for i := len(text) - 1; i >= 0; i-- {
-			if LetraMinuscula(text[i]) && i == len(text) {
-				break
-			} else if !LetraMinuscula(text[i]) {
+		for i := len(word) - 1; i >= 0; i-- {
+			if !ItsLyrics(word[i]) {
 				caractersIndex = i
-			} else if LetraMinuscula(text[i]) && text[i-1] == 92 {
+			} else if ItsLyrics(word[i]) && word[i-1] == 92 {
 				caractersIndex = i
 			} else {
 				break
 			}
 		}
 
-		var caractersFromText string
+		var caractersFromWord string
 
 		if caractersIndex != 0 {
-			caractersFromText = text[caractersIndex:]
-			text = text[:caractersIndex]
+			caractersFromWord = word[caractersIndex:]
+			word = word[:caractersIndex]
 		}
 
-		fmt.Println(caractersFromText)
-
-		var newText string
+		var convertedWord string
 
 		if quantity == jumps {
-			indlexByPercentage := (percentage * len(text)) / 100
+			indlexByPercentage := (percentage * len(word)) / 100
 
-			part1 := text[:indlexByPercentage]
-			part2 := text[indlexByPercentage:]
-			newText = caracteresToAdd + part1 + caracteresToAdd + part2 + caractersFromText
+			part1 := word[:indlexByPercentage]
+			part2 := word[indlexByPercentage:]
+			convertedWord = caracteresToAdd + part1 + caracteresToAdd + part2 + caractersFromWord
 			quantity = 0
 		} else {
-			newText = text
+			convertedWord = word
 			quantity++
 		}
 
-		newTexts = append(newTexts, newText)
+		convertedWords = append(convertedWords, convertedWord)
 	}
 
-	return strings.Join(newTexts, " ")
+	return strings.Join(convertedWords, " ")
 }
 
-func LetraMinuscula(byteCaracter byte) bool {
-	return byteCaracter >= 97 && byteCaracter <= 122
+func ItsLyrics(byteCaracter byte) bool {
+	return byteCaracter >= 65 && byteCaracter <= 90 || byteCaracter >= 97 && byteCaracter <= 122
+}
+
+func TreatLineBreak(fullText string) []string {
+
+	words := strings.Split(fullText, " ")
+	var treatedWords string
+
+	for _, word := range words {
+		for i := len(word) - 1; i >= 0; i-- {
+			if word[i] == 10 {
+				parte1 := word[:i]
+				parte2 := word[i+1:]
+				word = parte1 + "\\n " + parte2
+			} else {
+				continue
+			}
+		}
+		word = word + " "
+
+		treatedWords = treatedWords + word
+	}
+
+	return strings.Fields(treatedWords)
 }
