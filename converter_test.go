@@ -65,7 +65,7 @@ func TestShouldConvert70PercentageInBoldOnlyWordsAndKeepBreakLine(t *testing.T) 
 	jumps := 0
 	text := "maturidade\n maturidade"
 
-	expectedText := "**maturid**ade\n **maturid**ade"
+	expectedText := "**maturid**ade\\n **maturid**ade"
 
 	convertResult := ConvertTextToBold(percentage, text, jumps)
 
